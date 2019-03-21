@@ -1,45 +1,79 @@
+from sqlalchemy.orm import relationship
+
 from . import db
+from sqlalchemy import Integer, Column, String, ForeignKey, DateTime
+
+
+# db.metadata.clear()
+
+
+class Film(db.Model):
+    """Modele d'un film avec son nom et sa durée (en minutes)"""
+    __tablename__ = 'film'
+    __mapper_args__ = {'column_prefix': 'film_'}
+    id = Column(Integer, nullable=False, unique=True, primary_key=True)
+    nom = Column(String, nullable=False, unique=False)
+    duree = Column(Integer, nullable=False, unique=False)
 
 
 class Seance(db.Model):
     """Item du planning des séances"""
-    def __init__(self, id_sceance, film, date_debut, date_fin, duree_sceance):
-        self.id_sceance = id_sceance
-        self.film = film
-        self.date_debut = date_debut
-        self.date_fin = date_fin
-        self.duree_sceance = duree_sceance
-    pass
+    __tablename__ = 'seance'
+    __mapper_args__ = {'column_prefix': 'seance_'}
+    id = Column(Integer, nullable=False, unique=True, primary_key=True)
+    film = Column(Integer, ForeignKey('film.id'))
+    debut = Column(DateTime, nullable=False, unique=False)
+    fin = Column(DateTime, nullable=False, unique=False)
+    duree = Column(Integer, nullable=False, unique=False)
+    cinema = Column(Integer, ForeignKey('cinema.id'))
 
 
-class Film(db.Model):
-    """Modele d'un film avec son nom et sa durée"""
-    def __init__(self, nom, duree, sypnosis):
-        self.nom = nom
-        self.duree = duree
-        self.sypnosis = sypnosis
-    pass
+class Place(db.Model):
+    """Une place dans une salle de cinéma"""
+    __tablename__ = 'place'
+    __mapper_args__ = {'column_prefix': 'place_'}
+    id = Column(Integer, nullable=False, unique=True, primary_key=True)
+    nom = Column(String, nullable=False, unique=False)
+    salle = Column(Integer, ForeignKey('salle.id'))
 
 
 class Salle(db.Model):
     """Item du planning des salles"""
-    def __init__(self, cinema, numero_salle, capacite_salle, numero_siege):
-        self.cinema = cinema
-        self.numero_salle = numero_salle
-        self.capacite_salle = capacite_salle
-        self.numero_siege = numero_siege
-    pass
+    __tablename__ = 'salle'
+    __mapper_args__ = {'column_prefix': 'salle_'}
+    id = Column(Integer, nullable=False, unique=True, primary_key=True)
+    cinema = Column(Integer, ForeignKey('cinema.id'), nullable=False)
+    nom = Column(String, nullable=False, unique=False)
+    capacite = Column(Integer, nullable=False, unique=False)
+    places = relationship('Place')
 
 
-class Resa(db.Model):
-    """Materialise une réservation de séance"""
-    def __init__(self, nom_client, prenom_client, siege_reserver):
-        self.nom_client = nom_client
-        self.prenom_client = prenom_client
-        self.siege_reserver = siege_reserver
-    pass
+class Cinema(db.Model):
+    """Un cinéma possède des salles qui projetent des films"""
+    __tablename__ = 'cinema'
+    __mapper_args__ = {'column_prefix': 'cinema_'}
+    id = Column(Integer, nullable=False, unique=True, primary_key=True)
+    nom = Column(String, nullable=False, unique=False)
+    salles = relationship('Salle')
+    seances = relationship('Seance')
 
-# Est-ce qu'il faut un compte ?
-# class User(db.Model):
-#     """Il faut un compte afin de pouvoir réserver une place de cinéma"""
-#     pass
+
+class Reservation(db.Model):
+    """Une réservation lie une place, une séance et un client"""
+    __tablename__ = 'reservation'
+    __mapper_args__ = {'column_prefix': 'resa_'}
+    id = Column(Integer, nullable=False, unique=True, primary_key=True)
+    client = Column(Integer, ForeignKey('client.id'))
+    siege = Column(Integer, ForeignKey('place.id'))
+    seance = Column(Integer, ForeignKey('seance.id'))
+
+
+class Client(db.Model):
+    __tablename__ = 'client'
+    __mapper_args__ = {'column_prefix': 'client_'}
+    id = Column(Integer, nullable=False, unique=True, primary_key=True)
+    nom = Column(String, nullable=False)
+    prenom = Column(String, nullable=False)
+    email = Column(String, nullable=False)
+    password = Column(String, nullable=False)
+    reservations = relationship('Reservation')

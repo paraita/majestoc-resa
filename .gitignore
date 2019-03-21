@@ -396,3 +396,6 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+*.db
+local.cfg
