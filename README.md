@@ -24,5 +24,12 @@ Pour lancer l'appli:
 python3 starter.py
 ````
 
+ou:
+````bash
+./starter.py
+````
+
+
+
 # License
 Le contenu de ce dépôt est sous license GPL3.

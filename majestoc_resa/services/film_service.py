@@ -1,14 +1,12 @@
 from flask_restplus import Resource, Namespace
 
-api = Namespace('films', description='Les films')
+from majestoc_resa.model import Film
 
-LIST_FILMS = [
-    {'nom': 'Star Wars Un Nouvel Espoir', 'duree': 120},
-    {'nom': "Star Wars l'empire contre attaque", 'duree': 140}
-]
+api = Namespace('films', description='Les films')
 
 
 @api.route('/')
 class FilmService(Resource):
     def get(self):
-        return LIST_FILMS
+        films = [{'titre': c.film_nom, 'duree': c.film_duree} for c in Film.query.all()]
+        return films
