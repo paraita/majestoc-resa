@@ -21,7 +21,7 @@ def get_full_path(file_path=None):
 def main(argv=None):
     args = parse_args(argv)
     app = create_app(get_full_path(args.config))
-    app.run()
+    app.run(host='0.0.0.0', port=5000)
 
 
 if __name__ == "__main__":
